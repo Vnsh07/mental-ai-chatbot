@@ -14,7 +14,7 @@ _model = None
 
 if _api_key:
     genai.configure(api_key=_api_key)
-    _model = genai.GenerativeModel("gemini-1.5-flash-latest")
+    _model = genai.GenerativeModel("gemini-2.0-flash")
 @router.post("/chat")
 def chat(
     body: ChatRequest,
