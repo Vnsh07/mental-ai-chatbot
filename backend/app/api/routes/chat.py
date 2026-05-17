@@ -87,10 +87,19 @@ User message:
         raise
     except google_exceptions.GoogleAPIError as exc:
         logger.exception("Gemini API error")
-        raise HTTPException(
-            status_code=502,
-            detail=f"AI service error: {exc}",
-        ) from exc
+        message = str(exc)
+        if "429" in message or "quota" in message.lower():
+            detail = (
+                "AI quota exceeded. Enable billing or use a valid API key in Google AI Studio."
+            )
+        elif "404" in message and "not found" in message.lower():
+            detail = (
+                "AI model not found. Set GEMINI_MODEL to a model your key supports "
+                "(e.g. gemini-2.0-flash). See Google AI Studio model list."
+            )
+        else:
+            detail = f"AI service error: {message}"
+        raise HTTPException(status_code=502, detail=detail) from exc
     except Exception as exc:
         logger.exception("Unexpected chat error")
         raise HTTPException(
