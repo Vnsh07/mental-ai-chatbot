@@ -1,11 +1,20 @@
 import axios from "axios";
 import { AUTH_STORAGE } from "../constants/authStorage";
 
-const baseURL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+function resolveBaseURL() {
+  const configured = import.meta.env.VITE_API_URL;
+  if (configured === undefined || configured === "") {
+    return import.meta.env.DEV ? "" : "http://127.0.0.1:8000";
+  }
+  return String(configured).replace(/\/$/, "");
+}
+
+const baseURL = resolveBaseURL();
 
 export const api = axios.create({
   baseURL,
   headers: { "Content-Type": "application/json" },
+  timeout: 120000,
 });
 
 api.interceptors.request.use((config) => {

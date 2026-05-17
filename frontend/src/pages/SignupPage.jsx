@@ -6,20 +6,8 @@ import {
   AuthInput,
 } from "../components/auth/AuthFormFields";
 import { useAuth } from "../context/AuthContext";
-
-function validateEmail(email) {
-  const t = email.trim();
-  if (!t) return "Email is required";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) return "Enter a valid email";
-  return "";
-}
-
-function validatePassword(password) {
-  if (!password) return "Password is required";
-  if (password.length < 8) return "Use at least 8 characters";
-  if (password.length > 128) return "Password is too long";
-  return "";
-}
+import { getApiErrorMessage } from "../utils/apiErrors";
+import { validateEmail, validatePassword } from "../utils/validation";
 
 export function SignupPage() {
   const { user, loading: authLoading, signup } = useAuth();
@@ -27,11 +15,7 @@ export function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [errors, setErrors] = useState(
-    /** @type {{ email?: string, password?: string, confirm?: string, form?: string }} */ (
-      {}
-    ),
-  );
+  const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   if (authLoading) {
@@ -69,14 +53,9 @@ export function SignupPage() {
         full_name: fullName.trim() || null,
       });
     } catch (err) {
-      const d = err?.response?.data?.detail;
-      const msg =
-        typeof d === "string"
-          ? d
-          : Array.isArray(d)
-            ? d.map((x) => x.msg || x).join(" ")
-            : "Could not create account.";
-      setErrors({ form: msg });
+      setErrors({
+        form: getApiErrorMessage(err, "Could not create account."),
+      });
     } finally {
       setSubmitting(false);
     }

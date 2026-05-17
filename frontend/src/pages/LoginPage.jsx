@@ -6,19 +6,8 @@ import {
   AuthInput,
 } from "../components/auth/AuthFormFields";
 import { useAuth } from "../context/AuthContext";
-
-function validateEmail(email) {
-  const t = email.trim();
-  if (!t) return "Email is required";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) return "Enter a valid email";
-  return "";
-}
-
-function validatePassword(password) {
-  if (!password) return "Password is required";
-  if (password.length < 8) return "Use at least 8 characters";
-  return "";
-}
+import { getApiErrorMessage } from "../utils/apiErrors";
+import { validateEmail, validatePassword } from "../utils/validation";
 
 export function LoginPage() {
   const { user, loading: authLoading, login } = useAuth();
@@ -60,11 +49,11 @@ export function LoginPage() {
     try {
       await login({ email: email.trim(), password });
     } catch (err) {
-      const msg =
-        err?.response?.data?.detail ||
-        "Could not sign in. Check your details and try again.";
       setErrors({
-        form: typeof msg === "string" ? msg : "Sign in failed",
+        form: getApiErrorMessage(
+          err,
+          "Could not sign in. Check your details and try again.",
+        ),
       });
     } finally {
       setSubmitting(false);

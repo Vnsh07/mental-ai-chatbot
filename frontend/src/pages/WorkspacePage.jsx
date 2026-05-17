@@ -12,6 +12,7 @@ import { useChatScroll } from "../hooks/useChatScroll";
 import { useMoodLog } from "../hooks/useMoodLog";
 import { usePersistentChat } from "../hooks/usePersistentChat";
 import { api } from "../lib/api";
+import { getApiErrorMessage } from "../utils/apiErrors";
 
 export function WorkspacePage() {
   const { user, logout } = useAuth();
@@ -80,13 +81,16 @@ export function WorkspacePage() {
 
       setChat((prev) => [...prev, aiMessage]);
     } catch (error) {
-      console.log(error);
+      const message = getApiErrorMessage(
+        error,
+        "Something went wrong reaching the assistant. Try again in a moment.",
+      );
       setChat((prev) => [
         ...prev,
         {
           id: crypto.randomUUID(),
           role: "ai",
-          text: "Something went wrong reaching the assistant. Try again in a moment.",
+          text: message,
           createdAt: new Date().toISOString(),
         },
       ]);
