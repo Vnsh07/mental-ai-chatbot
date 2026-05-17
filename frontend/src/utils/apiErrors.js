@@ -3,9 +3,17 @@
  * @param {unknown} err
  * @param {string} fallback
  */
+import { apiBaseURL } from "../lib/api";
+
 export function getApiErrorMessage(err, fallback = "Something went wrong.") {
   if (err?.code === "ERR_NETWORK" || err?.message === "Network Error") {
-    return "Cannot reach the API. Check VITE_API_URL, that the backend is running, and CORS_ORIGINS on the server.";
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : "your frontend";
+    return (
+      `Cannot reach the API at ${apiBaseURL || "(not configured)"}. ` +
+      `On Render, set CORS_ORIGINS (and/or CORS_ORIGIN_REGEX) to include ${origin}. ` +
+      `On Vercel, set VITE_API_URL to your Render URL and redeploy.`
+    );
   }
   const detail = err?.response?.data?.detail;
   if (typeof detail === "string" && detail.trim()) {

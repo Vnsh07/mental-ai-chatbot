@@ -22,10 +22,11 @@ services:
         value: HS256
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "10080"
-      # Set to your frontend URL(s), comma-separated, no trailing slashes:
-      # http://localhost:5173,https://mental-ai-frontend.onrender.com
+      # Comma-separated origins + Vercel regex (see backend .env.example)
       - key: CORS_ORIGINS
         sync: false
+      - key: CORS_ORIGIN_REGEX
+        value: https://.*\.vercel\.app
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL

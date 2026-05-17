@@ -24,13 +24,16 @@ def create_application() -> FastAPI:
     )
 
     cors_origins = settings.cors_origin_list or ["http://localhost:5173"]
-    application.add_middleware(
-        CORSMiddleware,
-        allow_origins=cors_origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    cors_kwargs: dict = {
+        "allow_origins": cors_origins,
+        "allow_credentials": True,
+        "allow_methods": ["*"],
+        "allow_headers": ["*"],
+    }
+    cors_regex = (settings.cors_origin_regex or "").strip()
+    if cors_regex:
+        cors_kwargs["allow_origin_regex"] = cors_regex
+    application.add_middleware(CORSMiddleware, **cors_kwargs)
     application.include_router(auth.router, prefix="/api/v1")
     application.include_router(chat.router, prefix="/api/v1")
 

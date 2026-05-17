@@ -1,15 +1,27 @@
 import axios from "axios";
 import { AUTH_STORAGE } from "../constants/authStorage";
 
+/** Render API — override with VITE_API_URL in Vercel if your service URL differs. */
+const DEFAULT_PRODUCTION_API = "https://mental-ai-chatbot.onrender.com";
+
 function resolveBaseURL() {
-  const configured = import.meta.env.VITE_API_URL;
-  if (configured === undefined || configured === "") {
-    return import.meta.env.DEV ? "" : "http://127.0.0.1:8000";
+  const raw = import.meta.env.VITE_API_URL;
+  const configured = raw === undefined || raw === null ? "" : String(raw).trim();
+
+  if (configured) {
+    return configured.replace(/\/$/, "");
   }
-  return String(configured).replace(/\/$/, "");
+
+  if (import.meta.env.DEV) {
+    return "";
+  }
+
+  return DEFAULT_PRODUCTION_API;
 }
 
-const baseURL = resolveBaseURL();
+export const apiBaseURL = resolveBaseURL();
+
+const baseURL = apiBaseURL;
 
 export const api = axios.create({
   baseURL,
